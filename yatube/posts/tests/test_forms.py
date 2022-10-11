@@ -116,8 +116,8 @@ class PostFormTests(TestCase):
         response = self.authorized_client.post(
             reverse('posts:add_comment', kwargs={
                 'post_id': self.post.id}),
-                data=form_data, 
-                follow=True
+                 data=form_data,
+                 follow=True
         )
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Comment.objects.filter(
