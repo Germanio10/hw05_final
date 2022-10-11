@@ -1,3 +1,4 @@
+from django.db.utils import IntegrityError
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Follow, Group, Post, User
@@ -115,7 +116,10 @@ def follow_index(request):
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
     if request.user != author:
-        Follow.objects.create(user=request.user, author=author)
+        try:
+            Follow.objects.create(user=request.user, author=author)
+        except IntegrityError:
+            return redirect('posts:follow_index')
     return redirect('posts:follow_index')
 
 
