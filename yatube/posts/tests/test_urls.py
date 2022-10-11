@@ -1,4 +1,4 @@
-from urllib import response
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from ..models import Group, Post
@@ -53,7 +53,7 @@ class PostURLTests(TestCase):
         url_names = {
             '/': 'posts/index.html',
             '/group/test-slug/': '/group/test-slug/',
-            f'/profile/HasNoName/': 'posts/profile.html',
+            '/profile/HasNoName/': 'posts/profile.html',
             f'/posts/{self.post.pk}/': 'posts/post_detail.html'
         }
         for name in url_names:

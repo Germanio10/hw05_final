@@ -37,6 +37,7 @@ class Post(models.Model):
         upload_to='posts/',
         blank=True
     )
+    
     def __str__(self) -> str:
         return self.text
 

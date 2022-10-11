@@ -1,6 +1,3 @@
-
-
-
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -23,13 +20,13 @@ class PostPageTests(TestCase):
             slug='test-slug',
             description='test description')
 
-        small_gif = (     
-             b'\x47\x49\x46\x38\x39\x61\x02\x00'
-             b'\x01\x00\x80\x00\x00\x00\x00\x00'
-             b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-             b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-             b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-             b'\x0A\x00\x3B'
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
         )
         cls.uploaded = SimpleUploadedFile(
             name='small.gif',
@@ -82,7 +79,6 @@ class PostPageTests(TestCase):
         self.assertEqual(post_group_0, self.group)
         self.assertEqual(post_author_0, self.user)
         self.assertEqual(post_image_0, self.uploaded)
-
 
     def test_group_list_show_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом"""
@@ -220,7 +216,7 @@ class PaginatorTestViews(TestCase):
         reverse_list = [
             reverse('posts:main_page'),
             reverse('posts:group_list', kwargs={'slug': 'test-slug'}),
-            reverse('posts:profile', 
+            reverse('posts:profile',
                     kwargs={'username': f'{self.user.username}'})
         ]
         for reverse_name in reverse_list:
