@@ -245,7 +245,6 @@ class FollowTest(TestCase):
                                                       self.user_following.
                                                       username}))
         self.assertEqual(Follow.objects.all().count(), 1)
-     
 
     def test_unfollow(self):
         """Корректная работа отписки"""
