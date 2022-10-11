@@ -1,16 +1,15 @@
-from datetime import date
-from distutils.command.upload import upload
+
+
 import shutil
 import tempfile
-from urllib import response
+
 from django.conf import settings
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-from requests import post
+
 from posts.forms import CommentForm, PostForm
 from posts.models import Group, Post, User, Comment
 from django.core.files.uploadedfile import SimpleUploadedFile
-
 
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -50,7 +49,7 @@ class PostFormTests(TestCase):
     def test_create_post(self):
         '''Проверка создания поста'''
         posts_count = Post.objects.count()
-        small_gif = (            
+        small_gif = (  
              b'\x47\x49\x46\x38\x39\x61\x02\x00'
              b'\x01\x00\x80\x00\x00\x00\x00\x00'
              b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
@@ -126,5 +125,3 @@ class PostFormTests(TestCase):
                         ).exists())
         self.assertEqual(Comment.objects.count(),
                          comments_count + 1)
-      
-    

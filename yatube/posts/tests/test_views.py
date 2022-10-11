@@ -1,6 +1,6 @@
-from cgitb import handler, small
-from email.mime import image
-from urllib import response
+
+
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -23,7 +23,7 @@ class PostPageTests(TestCase):
             slug='test-slug',
             description='test description')
 
-        small_gif = (            
+        small_gif = (     
              b'\x47\x49\x46\x38\x39\x61\x02\x00'
              b'\x01\x00\x80\x00\x00\x00\x00\x00'
              b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
@@ -31,7 +31,7 @@ class PostPageTests(TestCase):
              b'\x02\x00\x01\x00\x00\x02\x02\x0C'
              b'\x0A\x00\x3B'
         )
-        cls.uploaded =SimpleUploadedFile(
+        cls.uploaded = SimpleUploadedFile(
             name='small.gif',
             content=small_gif,
             content_type='image/gif'
@@ -82,7 +82,6 @@ class PostPageTests(TestCase):
         self.assertEqual(post_group_0, self.group)
         self.assertEqual(post_author_0, self.user)
         self.assertEqual(post_image_0, self.uploaded)
-        
 
 
     def test_group_list_show_correct_context(self):
@@ -179,15 +178,15 @@ class PostPageTests(TestCase):
                     kwargs={'slug': 'test-slugg'}))
         group = response_group.context['page_obj']
         self.assertNotIn(self.post, group)
-    
+
     def test_post_with_comment(self):
         """Comment с постом появится на страницах"""
         response_detail = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={'post_id': self.post.pk}))
         detail = response_detail.context['comments']
- 
+
         self.assertIn(self.comment, detail)
-    
+
 
 class PaginatorTestViews(TestCase):
     def setUp(self):
@@ -209,7 +208,7 @@ class PaginatorTestViews(TestCase):
         reverse_list = [
             reverse('posts:main_page'),
             reverse('posts:group_list', kwargs={'slug': 'test-slug'}),
-            reverse('posts:profile', kwargs={'username':'Name'})
+            reverse('posts:profile', kwargs={'username': 'Name'})
         ]
         for reverse_name in reverse_list:
             with self.subTest(reverse_name=reverse_name):
@@ -221,7 +220,8 @@ class PaginatorTestViews(TestCase):
         reverse_list = [
             reverse('posts:main_page'),
             reverse('posts:group_list', kwargs={'slug': 'test-slug'}),
-            reverse('posts:profile', kwargs={'username': f'{self.user.username}'})
+            reverse('posts:profile', 
+                    kwargs={'username': f'{self.user.username}'})
         ]
         for reverse_name in reverse_list:
             with self.subTest(reverse_name=reverse_name):
@@ -241,7 +241,6 @@ class FollowTest(TestCase):
         )
         self.client_auth_follower.force_login(self.user_follower)
         self.client_auth_following.force_login(self.user_following)
-
 
     def test_follow(self):
         """Корректная работа подписки"""

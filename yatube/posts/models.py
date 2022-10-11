@@ -1,6 +1,3 @@
-from distutils.command.upload import upload
-from email.mime import image
-from tabnanny import verbose
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -56,7 +53,7 @@ class Comment(models.Model):
         related_name='comments',
     )
     text = models.TextField(
-        verbose_name = 'Текст',
+        verbose_name='Текст',
         help_text='Введите текст комментария'
     )
     created = models.DateTimeField(auto_now_add=True)

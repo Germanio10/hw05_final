@@ -1,10 +1,10 @@
-from cmath import log
-import re
-from wsgiref.util import request_uri
+
+
+
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
-from requests import delete, post
-from .models import Follow, Group, Post, User, Comment
+
+from .models import Follow, Group, Post, User
 from .forms import CommentForm, PostForm
 from django.contrib.auth.decorators import login_required
 
@@ -40,7 +40,8 @@ def profile(request, username):
     author = get_object_or_404(User, username=username)
     author_posts = author.posts.all()
     if request.user.is_authenticated:
-        following = Follow.objects.filter(user=request.user, author=author).exists()
+        following = Follow.objects.filter(user=request.user,
+                                          author=author).exists()
     else:
         following = False
     context = {
@@ -50,7 +51,6 @@ def profile(request, username):
     context.update(get_page_context(author_posts, request))
     return render(request, 'posts/profile.html', context)
 
-   
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
@@ -84,7 +84,8 @@ def post_edit(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     if request.user != post.author:
         return redirect('posts:post_detail', post_id)
-    form = PostForm(request.POST or None, instance=post, files=request.FILES or None)
+    form = PostForm(request.POST or None, instance=post,
+                    files=request.FILES or None)
     if form.is_valid():
         form.save()
         return redirect('posts:post_detail', post_id)
@@ -112,6 +113,7 @@ def follow_index(request):
     posts = Post.objects.filter(author_id__in=follower)
     context = (get_page_context(posts, request))
     return render(request, 'posts/follow.html', context)
+
 
 @login_required
 def profile_follow(request, username):
