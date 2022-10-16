@@ -1,5 +1,6 @@
 
-
+from urllib import response
+from django.core.cache import cache
 import shutil
 import tempfile
 
@@ -111,7 +112,9 @@ class PostFormTests(TestCase):
         """Проверка создания комментария"""
         comments_count = Comment.objects.count()
         form_data = {
-            'text': 'test comment'
+            'text': 'test comment',
+            'author': self.author,
+            'post': self.post
         }
         response = self.authorized_client.post(
             reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
@@ -123,3 +126,32 @@ class PostFormTests(TestCase):
                         ).exists())
         self.assertEqual(Comment.objects.count(),
                          comments_count + 1)
+
+
+class PostCacheTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='Name')
+        cls.group= Group.objects.create(
+            title='test title',
+            slug='test-slug',
+            description='test description'
+        )
+        cls.author = User.objects.create_user(username='Username')
+        cls.guest_client = Client()
+        cls.guest_client.force_login(cls.user)
+
+    def test_cache(self):
+        before_create_post = self.guest_client.get(reverse('posts:main_page')).content
+        Post.objects.create(
+            text = 'test text',
+            author=self.author,
+            group=self.group
+        )
+        after_create_post = self.guest_client.get(reverse('posts:main_page')).content
+        self.assertEqual(before_create_post, after_create_post)
+        cache.clear()
+        after_clear = self.guest_client.get(reverse('posts:main_page')).content
+        self.assertNotEqual(after_clear, before_create_post)
+       

@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -48,6 +49,7 @@ class PostPageTests(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        cache.clear()
 
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон"""
@@ -246,12 +248,24 @@ class FollowTest(TestCase):
                                                       username}))
         self.assertEqual(Follow.objects.all().count(), 1)
 
+    def test_subscription_feed(self):
+        """Запись появляется в ленте подписчиков"""
+        Follow.objects.create(user=self.user_follower,
+                              author=self.user_following)
+        response = self.client_auth_follower.get('/follow/')
+        post_text_0 = response.context["page"][0].text
+        self.assertEqual(post_text_0, 'Тестовая запись для тестирования ленты')
+        response = self.client_auth_following.get('/follow/')
+        self.assertNotContains(response,
+                               'Тестовая запись для тестирования ленты')
+
+
     def test_unfollow(self):
         """Корректная работа отписки"""
-        self.client_auth_follower.get(reverse('posts:profile_follow',
-                                              kwargs={'username':
-                                                      self.user_following.
-                                                      username}))
+        Follow.objects.create(
+            author=self.user_following,
+            user=self.user_follower
+        )
         self.client_auth_follower.get(reverse('posts:profile_unfollow',
                                               kwargs={'username':
                                                       self.user_following.

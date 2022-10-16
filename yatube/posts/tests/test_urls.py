@@ -1,7 +1,10 @@
 
+from urllib import response
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
-from ..models import Group, Post
+
+
+from ..models import Group, Post, Follow, Comment
 
 User = get_user_model()
 
@@ -11,6 +14,11 @@ class PostURLTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='HasNoName')
+        cls.user_user = User.objects.create_user(username='Name')
+        cls.follow = Follow.objects.create(
+            author=cls.user,
+            user=cls.user_user
+        )
         cls.group = Group.objects.create(
             title='test title',
             slug='test-slug',
@@ -20,6 +28,11 @@ class PostURLTests(TestCase):
             text='test text',
             author=cls.user,
             group=cls.group,
+        )
+        cls.comment = Comment.objects.create(
+            post=cls.post,
+            author=cls.user,
+            text='test comment'
         )
 
     def setUp(self):
@@ -53,7 +66,7 @@ class PostURLTests(TestCase):
         url_names = {
             '/': 'posts/index.html',
             '/group/test-slug/': '/group/test-slug/',
-            '/profile/HasNoName/': 'posts/profile.html',
+            f'/profile/{self.user.username}/': 'posts/profile.html',
             f'/posts/{self.post.pk}/': 'posts/post_detail.html'
         }
         for name in url_names:
@@ -64,6 +77,7 @@ class PostURLTests(TestCase):
     def test_url_with_user_at_desired_location(self):
         """Страницы доступны авторизованному или автору"""
         url_names = {
+            '/profile/HasNoName/': 'posts/profile.html',
             '/create/': 'posts/create_post.html',
             f'/posts/{self.post.pk}/edit/': 'posts/create_post.html',
         }
@@ -76,14 +90,57 @@ class PostURLTests(TestCase):
         """"URL-адрес использует соответсвующий шаблон."""
         templates_url_names = {
             'fsdfsdf': 'core/404.html',
-            '/': 'posts/index.html',
+            # '/': 'posts/index.html',
             '/group/test-slug/': 'posts/group_list.html',
             '/profile/HasNoName/': 'posts/profile.html',
             f'/posts/{self.post.pk}/': 'posts/post_detail.html',
             '/create/': 'posts/create_post.html',
-            f'/posts/{self.post.pk}/edit/': 'posts/create_post.html'
+            f'/posts/{self.post.pk}/edit/': 'posts/create_post.html',
+            '/follow/': 'posts/follow.html'
         }
         for address, template in templates_url_names.items():
             with self.subTest(address=address):
                 response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
+
+    def test_profile_unfollow(self):
+        """Код 200 и редирект"""
+        response = self.authorized_client.get(
+            f'/profile/{self.user}/unfollow/',
+            follow=True
+        )
+        self.assertEqual(response.status_code, 200)
+        response = self.guest_client.get(
+            f'/profile/{self.user}/unfollow/',
+            follow=True
+        )
+        self.assertRedirects(response, 
+        f'/auth/login/?next=/profile/{self.user}/unfollow/')
+
+    def test_profile_follow(self):
+        """Код 200 и редирект"""
+        response = self.authorized_client.get(
+            f'/profile/{self.user}/follow/',
+            follow=True
+        )
+        self.assertEqual(response.status_code, 200)
+        response = self.guest_client.get(
+            f'/profile/{self.user}/follow/',
+            follow=True
+        )
+        self.assertRedirects(response, 
+        f'/auth/login/?next=/profile/{self.user}/follow/')
+    
+    def test_comment(self):
+        url = f'/auth/login/?next=/posts/{self.post.pk}/comment/'
+        url2 = f'/posts/{self.post.pk}/'
+        response = self.guest_client.get(
+            f'/posts/{self.post.pk}/comment/'
+        )
+        self.assertRedirects(response, url)
+        response = self.authorized_client.get(
+            f'/posts/{self.post.pk}/comment/'
+        )
+        self.assertRedirects(response, url2)
+
+        

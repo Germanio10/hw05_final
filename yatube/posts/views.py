@@ -1,3 +1,4 @@
+from django.views.decorators.cache import cache_page
 from django.db.utils import IntegrityError
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
@@ -16,7 +17,7 @@ def get_page_context(post_list, request):
         'page_obj': page_obj,
     }
 
-
+@cache_page(20, key_prefix='index_page')
 def index(request):
     post_list = Post.objects.all().order_by('-pub_date')
     context = get_page_context(post_list, request)
@@ -36,11 +37,9 @@ def group_posts(request, slug):
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     author_posts = author.posts.all()
-    if request.user.is_authenticated:
-        following = Follow.objects.filter(user=request.user,
-                                          author=author).exists()
-    else:
-        following = False
+    following = (
+    request.user.is_authenticated and
+    Follow.objects.filter(user=request.user, author=author).exists())
     context = {
         'following': following,
         'author': author
@@ -52,7 +51,7 @@ def profile(request, username):
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     form = CommentForm()
-    comments = post.comments.all()
+    comments = post.comments.select_related('author')
     context = {
         'post': post,
         'comments': comments,
@@ -104,10 +103,7 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    follower = Follow.objects.filter(user=request.user).values_list(
-        'author_id', flat=True
-    )
-    posts = Post.objects.filter(author_id__in=follower)
+    posts = Post.objects.filter(author__following__user=request.user)
     context = (get_page_context(posts, request))
     return render(request, 'posts/follow.html', context)
 
@@ -116,10 +112,7 @@ def follow_index(request):
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
     if request.user != author:
-        try:
-            Follow.objects.create(user=request.user, author=author)
-        except IntegrityError:
-            return redirect('posts:follow_index')
+        Follow.objects.get_or_create(user=request.user, author=author)
     return redirect('posts:follow_index')
 
 
