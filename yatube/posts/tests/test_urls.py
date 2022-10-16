@@ -112,9 +112,8 @@ class PostURLTests(TestCase):
             f'/profile/{self.user}/unfollow/',
             follow=True
         )
-        self.assertRedirects(response,
-        f'/auth/login/?next=/profile/{self.user}/unfollow/'
-             )
+        url = f'/auth/login/?next=/profile/{self.user}/unfollow/'
+        self.assertRedirects(response, url)
 
     def test_profile_follow(self):
         """Код 200 и редирект"""
@@ -129,7 +128,7 @@ class PostURLTests(TestCase):
         )
         url = f'/auth/login/?next=/profile/{self.user}/follow/'
         self.assertRedirects(response, url)
-           
+
     def test_comment(self):
         url = f'/auth/login/?next=/posts/{self.post.pk}/comment/'
         url2 = f'/posts/{self.post.pk}/'
