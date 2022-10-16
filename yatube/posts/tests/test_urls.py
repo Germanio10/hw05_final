@@ -1,5 +1,3 @@
-
-from urllib import response
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 
@@ -114,8 +112,9 @@ class PostURLTests(TestCase):
             f'/profile/{self.user}/unfollow/',
             follow=True
         )
-        self.assertRedirects(response, 
-        f'/auth/login/?next=/profile/{self.user}/unfollow/')
+        self.assertRedirects(response,
+        f'/auth/login/?next=/profile/{self.user}/unfollow/'
+                            )
 
     def test_profile_follow(self):
         """Код 200 и редирект"""
@@ -128,9 +127,10 @@ class PostURLTests(TestCase):
             f'/profile/{self.user}/follow/',
             follow=True
         )
-        self.assertRedirects(response, 
-        f'/auth/login/?next=/profile/{self.user}/follow/')
-    
+        self.assertRedirects(response,
+        f'/auth/login/?next=/profile/{self.user}/follow/'
+                            )
+
     def test_comment(self):
         url = f'/auth/login/?next=/posts/{self.post.pk}/comment/'
         url2 = f'/posts/{self.post.pk}/'
@@ -142,5 +142,3 @@ class PostURLTests(TestCase):
             f'/posts/{self.post.pk}/comment/'
         )
         self.assertRedirects(response, url2)
-
-        

@@ -1,5 +1,5 @@
 from django.views.decorators.cache import cache_page
-from django.db.utils import IntegrityError
+
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Follow, Group, Post, User
@@ -16,6 +16,7 @@ def get_page_context(post_list, request):
     return {
         'page_obj': page_obj,
     }
+
 
 @cache_page(20, key_prefix='index_page')
 def index(request):
@@ -39,7 +40,8 @@ def profile(request, username):
     author_posts = author.posts.all()
     following = (
     request.user.is_authenticated and
-    Follow.objects.filter(user=request.user, author=author).exists())
+    Follow.objects.filter(user=request.user, author=author).exists()
+    )
     context = {
         'following': following,
         'author': author

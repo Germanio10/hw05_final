@@ -259,7 +259,6 @@ class FollowTest(TestCase):
         self.assertNotContains(response,
                                'Тестовая запись для тестирования ленты')
 
-
     def test_unfollow(self):
         """Корректная работа отписки"""
         Follow.objects.create(

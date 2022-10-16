@@ -1,5 +1,3 @@
-
-from urllib import response
 from django.core.cache import cache
 import shutil
 import tempfile
@@ -133,7 +131,7 @@ class PostCacheTestCase(TestCase):
     def setUpClass(cls) -> None:
         super().setUpClass()
         cls.user = User.objects.create_user(username='Name')
-        cls.group= Group.objects.create(
+        cls.group = Group.objects.create(
             title='test title',
             slug='test-slug',
             description='test description'
@@ -143,15 +141,16 @@ class PostCacheTestCase(TestCase):
         cls.guest_client.force_login(cls.user)
 
     def test_cache(self):
-        before_create_post = self.guest_client.get(reverse('posts:main_page')).content
+        before_create_post = self.guest_client.get(
+            reverse('posts:main_page')).content
         Post.objects.create(
-            text = 'test text',
+            text='test text',
             author=self.author,
             group=self.group
         )
-        after_create_post = self.guest_client.get(reverse('posts:main_page')).content
+        after_create_post = self.guest_client.get(
+            reverse('posts:main_page')).content
         self.assertEqual(before_create_post, after_create_post)
         cache.clear()
         after_clear = self.guest_client.get(reverse('posts:main_page')).content
         self.assertNotEqual(after_clear, before_create_post)
-       
