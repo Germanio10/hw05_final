@@ -119,7 +119,7 @@ class PostFormTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Comment.objects.filter(
                         text='test text',
-                        author = self.author,
+                        author=self.author,
                         post=self.post
                         ).exists())
         self.assertEqual(Comment.objects.count(),
