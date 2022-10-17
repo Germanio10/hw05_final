@@ -110,9 +110,7 @@ class PostFormTests(TestCase):
         """Проверка создания комментария"""
         comments_count = Comment.objects.count()
         form_data = {
-            'text': 'test comment',
-            'author': self.author,
-            'post': self.post
+            'text': 'test text',
         }
         response = self.authorized_client.post(
             reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
@@ -120,7 +118,9 @@ class PostFormTests(TestCase):
             follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Comment.objects.filter(
-                        text='test comment',
+                        text='test text',
+                        author = self.author,
+                        post=self.post
                         ).exists())
         self.assertEqual(Comment.objects.count(),
                          comments_count + 1)

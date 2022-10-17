@@ -246,7 +246,10 @@ class FollowTest(TestCase):
                                               kwargs={'username':
                                                       self.user_following.
                                                       username}))
-        self.assertEqual(Follow.objects.all().count(), 1)
+        self.assertTrue(Follow.objects.filter(
+            author=self.user_following,
+            user=self.user_following
+        ).exists)
 
     def test_subscription_feed(self):
         """Запись появляется в ленте подписчиков"""
